@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BMI Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    
+    h1 {
+      text-align: center;
+    }
+    
+    #bmi-form {
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      border-radius: 4px;
+    }
+    
+    input[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    #result {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    
+    #diet-plan,
+    #training-plan {
+      margin-top: 20px;
+      display: none;
+    }
+    
+    #diet-plan h2,
+    #training-plan h2 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>BMI Calculator</h1>
+  
+  <div id="bmi-form">
+    <label for="weight">Weight (kg):</label>
+    <input type="number" id="weight" step="0.1" required>
+    
+    <label for="height">Height (cm):</label>
+    <input type="number" id="height" required>
+    
+    <input type="submit" value="Calculate BMI" onclick="calculateBMI()">
+  </div>
+  
+  <div id="result"></div>
+  
+  <div id="diet-plan">
+    <h2>Personalized Diet Plan</h2>
+    <p>This is your personalized diet plan based on your BMI.</p>
+    <div id="diet-plan-content"></div>
+  </div>
+  
+  <div id="training-plan">
+    <h2>Personalized Training Plan</h2>
+    <p>This is your personalized training plan based on your BMI.</p>
+    <div id="training-plan-content"></div>
+    <button onclick="generatePDF()">Download as PDF</button>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+  <script>
+    function calculateBMI() {
+      var weight = parseFloat(document.getElementById('weight').value);
+      var height = parseFloat(document.getElementById('height').value);
+      
+      if (isNaN(weight) || isNaN(height)) {
+        document.getElementById('result').innerHTML = 'Please enter valid weight and height.';
+        document.getElementById('diet-plan').style.display = 'none';
+        document.getElementById('training-plan').style.display = 'none';
+      } else {
+        var bmi = weight / ((height / 100) * (height / 100));
+        var resultElement = document.getElementById('result');
+        
+        resultElement.innerHTML = 'Your BMI: ' + bmi.toFixed(2);
+        
+        // Display personalized diet plan and training plan based on BMI
+        if (bmi < 18.5) {
+          document.getElementById('diet-plan').style.display = 'block';
+          document.getElementById('training-plan').style.display = 'block';
+          displayDietPlan("You are underweight. It is important to consume a balanced diet to gain healthy weight. Here is a sample diet plan:");
+          displayTrainingPlan("To improve your fitness, you can engage in strength training exercises. Consult a fitness professional for a personalized training plan.");
+        } else if (bmi >= 18.5 && bmi < 25) {
+          document.getElementById('diet-plan').style.display = 'block';
+          document.getElementById('training-plan').style.display = 'block';
+          displayDietPlan("You have a healthy weight. Maintain your weight with a balanced diet. Here is a sample diet plan:");
+          displayTrainingPlan("To stay fit and maintain your weight, regular exercise is recommended. Here is a sample training plan:");
+        } else {
+          document.getElementById('diet-plan').style.display = 'block';
+          document.getElementById('training-plan').style.display = 'block';
+          displayDietPlan("You are overweight. It is important to consume a balanced diet to lose weight. Here is a sample diet plan:");
+          displayTrainingPlan("To lose weight and improve your fitness, a combination of cardio and strength training exercises is recommended. Consult a fitness professional for a personalized training plan.");
+        }
+      }
+    }
+    
+    function displayDietPlan(content) {
+      document.getElementById('diet-plan-content').innerHTML = content;
+    }
+    
+    function displayTrainingPlan(content) {
+      document.getElementById('training-plan-content').innerHTML = content;
+    }
+    
+    function generatePDF() {
+      var dietPlanContent = document.getElementById('diet-plan-content').innerHTML;
+      var trainingPlanContent = document.getElementById('training-plan-content').innerHTML;
+      
+      var docDefinition = {
+        content: [
+          { text: 'Personalized Diet and Training Plan', style: 'header' },
+          { text: 'Diet Plan', style: 'subheader' },
+          { text: dietPlanContent, margin: [0, 10, 0, 0] },
+          { text: 'Training Plan', style: 'subheader' },
+          { text: trainingPlanContent, margin: [0, 10, 0, 0] },
+          { text: 'Nutrition Diet Plan', style: 'subheader' },
+          { text: 'Your personalized nutrition diet plan:', margin: [0, 10, 0, 0] },
+          { text: 'Breakfast: Oatmeal with fruits\nLunch: Grilled chicken with steamed vegetables\nDinner: Baked salmon with quinoa\nSnacks: Greek yogurt with berries', margin: [0, 0, 0, 10] },
+          { text: 'Exercise Plan', style: 'subheader' },
+          { text: 'Your personalized exercise plan:', margin: [0, 10, 0, 0] },
+          { text: 'Monday: Cardio exercises for 30 minutes\nTuesday: Strength training for upper body\nWednesday: Rest day\nThursday: Cardio exercises for 30 minutes\nFriday: Strength training for lower body\nSaturday: Yoga and stretching\nSunday: Rest day', margin: [0, 0, 0, 10] }
+        ],
+        styles: {
+          header: {
+            fontSize: 18,
+            bold: true,
+            alignment: 'center',
+            margin: [0, 0, 0, 10]
+          },
+          subheader: {
+            fontSize: 14,
+            bold: true,
+            margin: [0, 10, 0, 5]
+          }
+        }
+      };
+      
+      pdfMake.createPdf(docDefinition).download("personalized_plan.pdf");
+    }
+  </script>
+</body>
+</html>
